@@ -1,7 +1,7 @@
 import os
 import csv
 
-MASTER_FILE_PATH = "./test_csv_files/test_master_file.csv"
+MASTER_FILE_PATH = "test_master_file.csv"
 UPDATE_FILES_FOLDER = "./update_files" # put all update csv files in this folder
 UPDATE_FILES = os.listdir(UPDATE_FILES_FOLDER)  # list of all files in "update_files" folder
 print(UPDATE_FILES) #=> ['test_update_file_1.csv', 'test_update_file_2.csv']
