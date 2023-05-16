@@ -2,8 +2,8 @@
 import csv # built in csv module
 MASTER_FILE = "./test_csv_files/test_master_file.csv"
 UPDATE_FILE = "./test_csv_files/test_update_file.csv"
-REMOVE_LEADING_ZEROS = True # if true, remove leading zeros from values in 2nd column when comparing
-REMOVE_SPACES = True # if true, remove spaces from 4th column when comparing
+REMOVE_LEADING_ZEROS = True # if true, remove leading zeros from values in 2nd column when comparing- does NOT remove leading zeros from either csv file
+REMOVE_SPACES = True # if true, remove spaces from 4th column when comparing- does NOT remove spcaes from either csv file
 
 
 # helper function- prints a 2D list (list of lists) in a nice table format
@@ -46,7 +46,7 @@ print('\n')
 update_file = open(UPDATE_FILE, "r") 
 update_file_csvreader = csv.reader(update_file)
 update_file_header = next(update_file_csvreader) 
-matches = [] # will contain rows (lists) to add to end of master csv file
+missing_rows = [] # will contain rows (lists) to add to end of master csv file
 
 for row in update_file_csvreader: # loop through rows in update csv (excluding header row)
   first_4_col = row[0:4] # Ex. ['ABC', '00456', '5665', ' HPV, 16/15']
@@ -60,27 +60,27 @@ for row in update_file_csvreader: # loop through rows in update csv (excluding h
   row_str = "~~".join(first_4_col)
 
   if row_str not in master_hash_table: 
-    matches.append(row) # add entire row to matches
+    missing_rows.append(row) # add entire row to missing_rows
 
 update_file.close()
 
 # print 2D list nicely
-print_nicely(matches)
-print("Number of Rows to Add to Master: " + str(len(matches)))
+print_nicely(missing_rows)
+print("Number of Rows to Add to Master: " + str(len(missing_rows)))
 # ATL	%%92089	118	  CYCLE BLACK VIEW MIX (16,18 OTHER)				
 # ERE	456	    6007	GAS DETAIL SIX, ALERT 
 
-# print(matches)
+# print(missing_rows)
 # [ ['ATL', '%%92089', '118', 'CYCLE BLACK VIEW MIX (16,18 OTHER)', '', '', '', ''], 
 #   ['ERE', '00456', '6007', 'GAS DETAIL SIX, ALERT', '', '', '', '']
 # ]
 
 
-# 3) add unique matches to end of master csv file
+# 3) add unique missing_rows to end of master csv file
 master_file = open(MASTER_FILE, "a") # "a" means append to file instead of overwriting entire file
 master_file_csvwriter = csv.writer(master_file)
 master_file_csvwriter.writerow("\n")
-master_file_csvwriter.writerows(matches)
+master_file_csvwriter.writerows(missing_rows)
 
 
 
