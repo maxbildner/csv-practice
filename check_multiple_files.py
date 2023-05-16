@@ -5,6 +5,7 @@ MASTER_FILE = "./test_csv_files/test_master_file.csv"
 UPDATE_FILES_FOLDER = "./update_files" # put all update csv files in this folder
 UPDATE_FILES = os.listdir(UPDATE_FILES_FOLDER)  # list of all files in "update_files" folder
 print(UPDATE_FILES) #=> ['test_update_file_1.csv', 'test_update_file_2.csv']
+print("\n")
 
 REMOVE_LEADING_ZEROS = True # if true, remove leading zeros from values in 2nd column when comparing- does NOT remove leading zeros from either csv file
 REMOVE_SPACES = True # if true, remove spaces from 4th column when comparing- does NOT remove spcaes from either csv file
@@ -59,14 +60,18 @@ def get_missing_rows(update_file_path, master_table):
   return missing_rows
 
 
+# 1) build hash table of master file outside the loop below so we don't have to rebuild on each loop iteration
 master_set = build_set(MASTER_FILE)
 
-# loop over each file path and check each file against master
+# 2) loop over each file path and check each file against master
 for update_file_path in UPDATE_FILES:
+
+  # 3) get missing rows (rows in update file that are not in master file)
   missing_rows = get_missing_rows(update_file_path, master_set)
   print(missing_rows)
+  print("\n")
 
-  # add missing_rows to master_set
+  # 4) add missing_rows to master_set
   for row in missing_rows:
     first_4_col = row[0:4] # Ex. ['ABC', '00456', '5665', ' HPV, 16/15']
     if REMOVE_LEADING_ZEROS:
@@ -77,7 +82,7 @@ for update_file_path in UPDATE_FILES:
     row_str = "~~".join(first_4_col) # Ex. 'ABC~~00456~~5665~~ HPV, 16/15'  we're using "~~" as a delimeter to separate columns since the likelyhood of two "~" showing in the csv is unlikely
     master_set.add(row_str) # only add first 4 columns to set (as a single string)
     
-  # 3) add missing rows to end of master csv file
+  # 5) add missing rows to end of master csv file
   master_file = open(MASTER_FILE, "a") # "a" means append to file instead of overwriting entire file
   master_file_csvwriter = csv.writer(master_file)
   master_file_csvwriter.writerow("\n")
