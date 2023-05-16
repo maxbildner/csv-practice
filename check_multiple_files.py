@@ -1,7 +1,7 @@
 import os
 import csv
 
-MASTER_FILE = "./test_csv_files/test_master_file.csv"
+MASTER_FILE_PATH = "./test_csv_files/test_master_file.csv"
 UPDATE_FILES_FOLDER = "./update_files" # put all update csv files in this folder
 UPDATE_FILES = os.listdir(UPDATE_FILES_FOLDER)  # list of all files in "update_files" folder
 print(UPDATE_FILES) #=> ['test_update_file_1.csv', 'test_update_file_2.csv']
@@ -11,10 +11,15 @@ REMOVE_LEADING_ZEROS = True # if true, remove leading zeros from values in 2nd c
 REMOVE_SPACES = True # if true, remove spaces from 4th column when comparing- does NOT remove spcaes from either csv file
 
 
+# helper function- prints a 2D list (list of lists) in a nice table format
+def print_nicely(matrix):
+  print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in matrix]))
+
+
 def build_set(file_path):
   f = open(file_path, "r") # create object reference to csv file
   f_csvreader = csv.reader(f) # create csvreader object
-  f_header = next(f_csvreader) # next() returns first row as a list of strings, and shifts master_file_csvreader data to start at next row
+  f_header = next(f_csvreader) # next() returns first row as a list of strings, and shifts csvreader object data to start at next row
   csv_set = set()
 
   for row in f_csvreader: # loop through rows in csv (excluding header row)
@@ -37,7 +42,7 @@ def build_set(file_path):
 
 
 def get_missing_rows(update_file_path, master_table):
-  update_file = open(update_file_path, "r") 
+  update_file = open(UPDATE_FILES_FOLDER + "/" + update_file_path, "r") 
   update_file_csvreader = csv.reader(update_file)
   update_file_header = next(update_file_csvreader) 
   missing_rows = [] # will contain rows (lists) to add to end of master csv file
@@ -61,14 +66,14 @@ def get_missing_rows(update_file_path, master_table):
 
 
 # 1) build hash table of master file outside the loop below so we don't have to rebuild on each loop iteration
-master_set = build_set(MASTER_FILE)
+master_set = build_set(MASTER_FILE_PATH)
 
 # 2) loop over each file path and check each file against master
 for update_file_path in UPDATE_FILES:
 
   # 3) get missing rows (rows in update file that are not in master file)
   missing_rows = get_missing_rows(update_file_path, master_set)
-  print(missing_rows)
+  print_nicely(missing_rows)
   print("\n")
 
   # 4) add missing_rows to master_set
@@ -83,7 +88,7 @@ for update_file_path in UPDATE_FILES:
     master_set.add(row_str) # only add first 4 columns to set (as a single string)
     
   # 5) add missing rows to end of master csv file
-  master_file = open(MASTER_FILE, "a") # "a" means append to file instead of overwriting entire file
+  master_file = open(MASTER_FILE_PATH, "a") # "a" means append to file instead of overwriting entire file
   master_file_csvwriter = csv.writer(master_file)
   master_file_csvwriter.writerow("\n")
   master_file_csvwriter.writerows(missing_rows)
