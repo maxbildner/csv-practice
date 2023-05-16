@@ -68,11 +68,14 @@ def get_missing_rows(update_file_path, master_table):
 # 1) build hash table of master file outside the loop below so we don't have to rebuild on each loop iteration
 master_set = build_set(MASTER_FILE_PATH)
 
+# list of lists to track all missing rows of all update files & master
+missing_rows = []
+
 # 2) loop over each file path and check each file against master
 for update_file_path in UPDATE_FILES:
 
   # 3) get missing rows (rows in update file that are not in master file)
-  missing_rows = get_missing_rows(update_file_path, master_set)
+  missing_rows += get_missing_rows(update_file_path, master_set)
   print_nicely(missing_rows)
   print("\n")
 
@@ -86,9 +89,10 @@ for update_file_path in UPDATE_FILES:
 
     row_str = "~~".join(first_4_col) # Ex. 'ABC~~00456~~5665~~ HPV, 16/15'  we're using "~~" as a delimeter to separate columns since the likelyhood of two "~" showing in the csv is unlikely
     master_set.add(row_str) # only add first 4 columns to set (as a single string)
-    
-  # 5) add missing rows to end of master csv file
-  master_file = open(MASTER_FILE_PATH, "a") # "a" means append to file instead of overwriting entire file
-  master_file_csvwriter = csv.writer(master_file)
-  master_file_csvwriter.writerow("\n")
-  master_file_csvwriter.writerows(missing_rows)
+
+
+# 5) add missing rows to end of master csv file
+master_file = open(MASTER_FILE_PATH, "a") # "a" means append to file instead of overwriting entire file
+master_file_csvwriter = csv.writer(master_file)
+master_file_csvwriter.writerow("\n")
+master_file_csvwriter.writerows(missing_rows)
